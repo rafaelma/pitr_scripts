@@ -1,0 +1,111 @@
+# ########################################################################## #
+#                                                                            # 
+# README                                                                     # 
+#                                                                            #
+# Copyright (c) 2008-2011 by                                                 #
+#                                                                            #
+# Rafael Martinez <r.m.guerrero@usit.uio.no>                                 #
+# Tommy Gildseth                                                             #
+# Roger Johansen <roger.johansen@usit.uio.no>                                #
+#                                                                            # 
+# USIT, University of Oslo, Norway.                                          #
+#                                                                            #
+# PITR_scripts is free software; you can redistribute it and/or modify       #
+# it under the terms of the GNU General Public License as published by       #
+# the Free Software Foundation; either version 3 of the License, or          #
+# (at your option) any later version.                                        #
+#                                                                            #
+# PITR_scripts is distributed in the hope that it will be useful,            #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+# GNU General Public License for more details.                               #
+#                                                                            #
+# You should have received a copy of the GNU General Public License          #
+# along with Foobar; if not, write to the Free Software                      #
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,                     #
+# MA  02110-1301  USA                                                        #
+#                                                                            # 
+# ########################################################################## #
+
+
+PITR_scripts is a set of scripts that can be used to archive WAL files
+and create a PITR-basebackup with PostgreSQL.
+
+FILES:
+------
+
+* pitr_globalconf.sh: Global variables and functions.
+
+* archive_last_wal.sh: Used to archive the last WAL file in use not
+  archived yet
+
+* archive_wal.sh: Used by PostgreSQL to archive WAL files.
+
+* pitr_basebackup.sh: Used to create a PITR basebackup and delete old
+  WAL archived files.
+
+
+INSTALL
+-------
+
+* Save these scripts in a directory in your PATH (e.g./usr/local/bin)
+
+* Your PGDATA directory must be in a LVM-LV in a LVM-VG with enough
+  free space to take a snapshot of the data LVM-LV
+
+* Your backup directory must be a dedicated partition, if possible in
+  a device other than the one used for PGDATA.
+
+* Update pitr_globalconf.sh with the values for your system.
+
+* Update postgres:crontab file with e.g.:
+
+  *  *  *  *  *   /usr/local/bin/archive_last_wal.sh -S hostname
+  01  03  *  *  *  /usr/local/bin/pitr_basebackup.sh -S hostname
+
+* Update /etc/sudoers with:
+  
+  postgres  ALL = NOPASSWD: /usr/sbin/lvcreate, /usr/sbin/lvremove, /usr/sbin/lvdisplay, /usr/sbin/vgdisplay, /bin/mount, /bin/umount
+
+* Turn on archive in $PGDATA/postgresql.conf:
+
+  < 8.3:
+  archive_mode = on           
+  archive_command = '/usr/local/bin/archive_wal.sh -P %p -F %f -S hostname'
+
+  > 8.3:
+  
+  wal_level = archive
+  archive_mode = on           
+  archive_command = '/usr/local/bin/archive_wal.sh -P %p -F %f -S hostname'
+
+
+TODO:
+-----
+
+We do not have support for multiple 'tablespaces' partitions.
+
+
+IMPORTANT INFORMATION
+---------------------
+
+A PITR basebackup is a complicated operation where many things can go wrong
+Things have to happen in the right order to avoid data lost or compromise 
+the integrity of our PITR backup.
+
+The worst things that can happen under a PITR basebackup is that 
+the backup partition gets full or that pitr_basebackup.sh is terminated 
+without the script cleaning up the LVM-snapshot created.
+We try to avoid these situations using multiple checks.
+
+We will try to clean up all the possible problems that we can get
+under an error situation / crash but if the script is not able to fix
+all the problems, here you have a list of possible normal ones:
+
+ - Files with size 0Kb or < 16MB under $PG_BACKUP_PITR_WAL
+ - $BACKUP_LABEL_FILE not being deleted
+ - pg_stop_backup() not being executed
+ - LVM snapshot still mounted under $PG_BACKUP_PITR_SNAPSHOT after script termination
+ - LVM snapshot still active under $DEV_PITR_SNAPSHOT_PARTITION after script termination
+
+
