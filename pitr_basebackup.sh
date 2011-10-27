@@ -158,7 +158,7 @@ $BACKUP_LOG_ERROR_MESSAGE_BOTTOM
 
 	TIMESTAMP=`$DATE_ "+[%Y-%m-%d %H:%M:%S]"`
 
-	echo -e "${TIMESTAMP} [WARNING] Estimated disk space need it larger than the available disk space under $PG_BACKUP_PITR_DATA. / ${PITR_DATA_AVAILABLE} / ${FIFTY_PORCENT_PG_DATA_USED} / ${FINAL_ESTIMATED_AVAILABLE_DISKSPACE} / ${FIVE_PORCENT_PITR_DATA_DISK}" >> $PITR_BASEBACKUP_LOG
+	echo -e "${TIMESTAMP} [WARNING] Estimated disk space needed larger than the available disk space under $PG_BACKUP_PITR_DATA. / ${PITR_DATA_AVAILABLE} / ${FIFTY_PORCENT_PG_DATA_USED} / ${FINAL_ESTIMATED_AVAILABLE_DISKSPACE} / ${FIVE_PORCENT_PITR_DATA_DISK}" >> $PITR_BASEBACKUP_LOG
 	exit 1;
     else
 	TIMESTAMP=`$DATE_ "+[%Y-%m-%d %H:%M:%S]"`
