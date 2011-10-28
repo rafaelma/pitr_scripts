@@ -50,8 +50,8 @@ INSTALL
 
 * Save these scripts in a directory in your PATH (e.g./usr/local/bin)
 
-* Your PGDATA directory must be in a LVM-LV in a LVM-VG with enough
-  free space to take a snapshot of the data LVM-LV
+* Your PGDATA directory must be a LVM-LV in a LVM-VG with enough
+  free space to take a snapshot of PGDATA
 
 * Your backup directory must be a dedicated partition, if possible in
   a device other than the one used for PGDATA.
@@ -73,7 +73,7 @@ INSTALL
   archive_mode = on           
   archive_command = '/usr/local/bin/archive_wal.sh -P %p -F %f -S hostname'
 
-  > 8.3:
+  > 8.4:
   
   wal_level = archive
   archive_mode = on           
