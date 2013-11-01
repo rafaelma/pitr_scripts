@@ -27,6 +27,20 @@
 #                                                                            # 
 # ########################################################################## #
 
+##################################################################################
+##################################################################################
+# ------------------
+# I M P O R T A N T:
+# ------------------
+#
+# We are not using these scripts anymore to manage PITR in our PostgreSQL systems.
+# They will not be maintained or updated anymore.
+#
+# We use BARMAN as a backup and recovery manager for PostgreSQL now.
+# Check http://www.pgbarman.org/ for more information 
+#
+##################################################################################
+##################################################################################
 
 PITR_scripts is a set of scripts that can be used to archive WAL files
 and create a PITR-basebackup with PostgreSQL.
